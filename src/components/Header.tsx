@@ -1,9 +1,71 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Header = () => {
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+
+  // Sample dropdown data - you can customize these items
+  const navigationItems = {
+    "L'ESCOLA": [
+      { title: "Presentació", href: "/escola/presentacio" },
+      { title: "Història", href: "/escola/historia" },
+      { title: "Organització", href: "/escola/organitzacio" },
+      { title: "Direcció", href: "/escola/direccio" },
+      { title: "Localització", href: "/escola/localitzacio" }
+    ],
+    "ESTUDIS": [
+      { title: "Graus", href: "/estudis/graus" },
+      { title: "Màsters", href: "/estudis/masters" },
+      { title: "Doctorats", href: "/estudis/doctorats" },
+      { title: "Formació Contínua", href: "/estudis/formacio-continua" },
+      { title: "Erasmus", href: "/estudis/erasmus" }
+    ],
+    "RECERCA": [
+      { title: "Grups de Recerca", href: "/recerca/grups" },
+      { title: "Projectes", href: "/recerca/projectes" },
+      { title: "Publicacions", href: "/recerca/publicacions" },
+      { title: "Tesis", href: "/recerca/tesis" },
+      { title: "Infraestructures", href: "/recerca/infraestructures" }
+    ],
+    "INTERNACIONAL": [
+      { title: "Mobilitat Estudiantil", href: "/internacional/mobilitat" },
+      { title: "Programes Internacionals", href: "/internacional/programes" },
+      { title: "Convenis", href: "/internacional/convenis" },
+      { title: "Erasmus+", href: "/internacional/erasmus" },
+      { title: "Estudiants Internacionals", href: "/internacional/estudiants" }
+    ],
+    "OCUPABILITAT": [
+      { title: "Borsa de Treball", href: "/ocupabilitat/borsa-treball" },
+      { title: "Pràctiques", href: "/ocupabilitat/practiques" },
+      { title: "Orientació Professional", href: "/ocupabilitat/orientacio" },
+      { title: "Empreses Col·laboradores", href: "/ocupabilitat/empreses" },
+      { title: "Alumni", href: "/ocupabilitat/alumni" }
+    ]
+  };
+
+  // Information dropdown items
+  const informationItems = [
+    { title: "Estudiants", href: "/informacio/estudiants" },
+    { title: "Professorat", href: "/informacio/professorat" },
+    { title: "PAS", href: "/informacio/pas" },
+    { title: "Empreses", href: "/informacio/empreses" },
+    { title: "Famílies", href: "/informacio/families" },
+    { title: "Mitjans de Comunicació", href: "/informacio/mitjans" }
+  ];
+
+  const handleMouseEnter = (item: string) => {
+    setActiveDropdown(item);
+  };
+
+  const handleMouseLeave = () => {
+    setActiveDropdown(null);
+  };
+
+  const handleClick = (item: string) => {
+    setActiveDropdown(activeDropdown === item ? null : item);
+  };
+
   return (
     <header className="w-full">
       {/* Top utilities bar */}
@@ -49,30 +111,86 @@ const Header = () => {
       </div>
 
       {/* Main navigation */}
-      <nav className="bg-black text-white">
+      <nav className="bg-black text-white relative">
         <div className="container mx-auto flex flex-wrap">
           <ul className="flex flex-wrap text-sm">
-            <li className="relative group">
-              <a href="#" className="block px-4 py-3 hover:bg-burgundy transition-colors">L'ESCOLA</a>
-            </li>
-            <li className="relative group">
-              <a href="#" className="block px-4 py-3 hover:bg-burgundy transition-colors">ESTUDIS</a>
-            </li>
-            <li className="relative group">
-              <a href="#" className="block px-4 py-3 hover:bg-burgundy transition-colors">RECERCA</a>
-            </li>
-            <li className="relative group">
-              <a href="#" className="block px-4 py-3 hover:bg-burgundy transition-colors">INTERNACIONAL</a>
-            </li>
-            <li className="relative group">
-              <a href="#" className="block px-4 py-3 hover:bg-burgundy transition-colors">OCUPABILITAT</a>
-            </li>
+            {Object.keys(navigationItems).map((item) => (
+              <li 
+                key={item}
+                className="relative group"
+                onMouseEnter={() => handleMouseEnter(item)}
+                onMouseLeave={handleMouseLeave}
+              >
+                <button
+                  onClick={() => handleClick(item)}
+                  className="flex items-center px-4 py-3 hover:bg-burgundy transition-colors"
+                >
+                  {item}
+                  <ChevronDown 
+                    className={`ml-1 h-3 w-3 transition-transform duration-200 ${
+                      activeDropdown === item ? 'rotate-180' : ''
+                    }`} 
+                  />
+                </button>
+                
+                {/* Dropdown Menu */}
+                {activeDropdown === item && (
+                  <div className="absolute top-full left-0 bg-white text-black shadow-lg border border-gray-200 min-w-64 z-50">
+                    <ul className="py-2">
+                      {navigationItems[item as keyof typeof navigationItems].map((subItem, index) => (
+                        <li key={index}>
+                          <Link
+                            to={subItem.href}
+                            className="block px-4 py-2 hover:bg-gray-100 transition-colors"
+                            onClick={() => setActiveDropdown(null)}
+                          >
+                            {subItem.title}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </li>
+            ))}
           </ul>
-          <div className="ml-auto">
-            <a href="#" className="flex items-center px-4 py-3 hover:bg-burgundy transition-colors">
-              <span>INFORMACIÓ PER A...</span>
-              <ChevronDown className="ml-2 h-4 w-4" />
-            </a>
+          <div className="ml-auto relative">
+            <div
+              className="relative"
+              onMouseEnter={() => handleMouseEnter('INFORMACIO')}
+              onMouseLeave={handleMouseLeave}
+            >
+              <button
+                onClick={() => handleClick('INFORMACIO')}
+                className="flex items-center px-4 py-3 hover:bg-burgundy transition-colors"
+              >
+                <span>INFORMACIÓ PER A...</span>
+                <ChevronDown 
+                  className={`ml-2 h-4 w-4 transition-transform duration-200 ${
+                    activeDropdown === 'INFORMACIO' ? 'rotate-180' : ''
+                  }`} 
+                />
+              </button>
+              
+              {/* Information Dropdown Menu */}
+              {activeDropdown === 'INFORMACIO' && (
+                <div className="absolute top-full right-0 bg-white text-black shadow-lg border border-gray-200 min-w-64 z-50">
+                  <ul className="py-2">
+                    {informationItems.map((item, index) => (
+                      <li key={index}>
+                        <Link
+                          to={item.href}
+                          className="block px-4 py-2 hover:bg-gray-100 transition-colors"
+                          onClick={() => setActiveDropdown(null)}
+                        >
+                          {item.title}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </nav>
